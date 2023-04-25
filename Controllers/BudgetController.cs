@@ -1,11 +1,13 @@
 using FinancioBackend.Dtos;
 using FinancioBackend.Repositories;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FinancioBackend.Controllers;
 
 [ApiController]
 [Route("budgets")]
+[Authorize]
 public class BudgetController : ControllerBase
 {
     private readonly IBudgetRepository _budgetRepository;

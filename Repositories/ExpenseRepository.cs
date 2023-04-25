@@ -18,14 +18,14 @@ public class ExpenseRepository : IExpenseRepository
     {
         var query = "INSERT INTO expenses (name, amount, budget_id) VALUES (@Name, @Amount, @BudgetId); SELECT LAST_INSERT_ID()";
 
+        var parameters = new DynamicParameters();
+
+        parameters.Add("Name", expense.Name, DbType.String);
+        parameters.Add("Amount", expense.Amount, DbType.Int32);
+        parameters.Add("BudgetId", budgetId, DbType.Int32);
+
         using (var connection = _context.CreateConnection())
         {
-            var parameters = new DynamicParameters();
-
-            parameters.Add("Name", expense.Name, DbType.String);
-            parameters.Add("Amount", expense.Amount, DbType.Int32);
-            parameters.Add("BudgetId", budgetId, DbType.Int32);
-
             var expenseId = await connection.QuerySingleAsync<int>(query, parameters);
 
             var createdExpense = new Expense
@@ -89,14 +89,14 @@ public class ExpenseRepository : IExpenseRepository
     {
         var query = "UPDATE expenses SET name = @Name, Amount = @Amount WHERE id = @Id";
 
+        var parameters = new DynamicParameters();
+
+        parameters.Add("Id", id, DbType.Int32);
+        parameters.Add("Name", expense.Name, DbType.String);
+        parameters.Add("Amount", expense.Amount, DbType.Int32);
+
         using (var connection = _context.CreateConnection())
         {
-            var parameters = new DynamicParameters();
-
-            parameters.Add("Id", id, DbType.Int32);
-            parameters.Add("Name", expense.Name, DbType.String);
-            parameters.Add("Amount", expense.Amount, DbType.Int32);
-
             await connection.ExecuteAsync(query, parameters);
         }
     }
