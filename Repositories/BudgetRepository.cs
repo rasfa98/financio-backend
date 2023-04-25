@@ -14,21 +14,18 @@ public class BudgetRepository : IBudgetRepository
         _context = context;
     }
 
-    public async Task<Budget> CreateBudget(CreateBudgetDto budget)
+    public async Task<Budget> CreateBudget(BudgetDto budget)
     {
-        var budgetQuery = "INSERT INTO budgets (name, amount) VALUES (@Name, @Amount); SELECT LAST_INSERT_ID()";
-        var expenseQuery = "INSERT INTO expenses (name, amount, budget_id) VALUES (@Name, @Amount, @BudgetId); SELECT LAST_INSERT_ID()";
+        var query = "INSERT INTO budgets (name, amount) VALUES (@Name, @Amount); SELECT LAST_INSERT_ID()";
+
+        var parameters = new DynamicParameters();
+
+        parameters.Add("Name", budget.Name, DbType.String);
+        parameters.Add("Amount", budget.Amount, DbType.Int32);
 
         using (var connection = _context.CreateConnection())
         {
-            connection.Open();
-
-            var budgetParameters = new DynamicParameters();
-
-            budgetParameters.Add("Name", budget.Name, DbType.String);
-            budgetParameters.Add("Amount", budget.Amount, DbType.Int32);
-
-            var budgetId = await connection.QuerySingleAsync<int>(budgetQuery, budgetParameters);
+            var budgetId = await connection.QuerySingleAsync<int>(query, parameters);
 
             var createdBudget = new Budget
             {
@@ -36,31 +33,6 @@ public class BudgetRepository : IBudgetRepository
                 Name = budget.Name,
                 Amount = budget.Amount,
             };
-
-            using (var transaction = connection.BeginTransaction())
-            {
-                foreach (var expense in budget.Expenses)
-                {
-                    var expenseParameters = new DynamicParameters();
-
-                    expenseParameters.Add("Name", expense.Name, DbType.String);
-                    expenseParameters.Add("Amount", expense.Amount, DbType.Int32);
-                    expenseParameters.Add("BudgetId", createdBudget.Id, DbType.Int32);
-
-                    var expenseId = await connection.QuerySingleAsync<int>(expenseQuery, expenseParameters, transaction: transaction);
-
-                    var createdExpense = new Expense
-                    {
-                        Id = expenseId,
-                        Name = expense.Name,
-                        Amount = expense.Amount,
-                    };
-
-                    createdBudget.Expenses.Add(createdExpense);
-                }
-
-                transaction.Commit();
-            }
 
             return createdBudget;
         }
@@ -70,15 +42,23 @@ public class BudgetRepository : IBudgetRepository
     {
         var query = "DELETE FROM budgets WHERE Id = @Id";
 
+        var parameters = new DynamicParameters();
+
+        parameters.Add("Id", id, DbType.Int32);
+
         using (var connection = _context.CreateConnection())
         {
-            await connection.ExecuteAsync(query, new { id });
+            await connection.ExecuteAsync(query, parameters);
         }
     }
 
     public async Task<Budget> GetBudget(int id)
     {
         var query = "SELECT * FROM budgets LEFT JOIN expenses ON budgets.id = expenses.budget_id WHERE budgets.id = @Id";
+
+        var parameters = new DynamicParameters();
+
+        parameters.Add("Id", id, DbType.Int32);
 
         using (var connection = _context.CreateConnection())
         {
@@ -98,7 +78,7 @@ public class BudgetRepository : IBudgetRepository
                 }
 
                 return currentBudget;
-            }, new { Id = id });
+            }, parameters);
 
             return budgets.Distinct().First();
         }
@@ -132,7 +112,7 @@ public class BudgetRepository : IBudgetRepository
         }
     }
 
-    public async Task UpdateBudget(int id, UpdateBudgetDto budget)
+    public async Task UpdateBudget(int id, BudgetDto budget)
     {
         var query = "UPDATE budgets SET Name = @Name, Amount = @Amount WHERE id = @Id";
 

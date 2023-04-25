@@ -7,7 +7,7 @@ public interface IBudgetRepository
 {
     public Task<IEnumerable<Budget>> GetBudgets();
     public Task<Budget> GetBudget(int id);
-    public Task<Budget> CreateBudget(CreateBudgetDto budget);
-    public Task UpdateBudget(int id, UpdateBudgetDto budget);
+    public Task<Budget> CreateBudget(BudgetDto budget);
+    public Task UpdateBudget(int id, BudgetDto budget);
     public Task DeleteBudget(int id);
 }

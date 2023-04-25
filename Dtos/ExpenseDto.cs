@@ -2,9 +2,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace FinancioBackend.Dtos;
 
-public class UpdateBudgetDto
+public class ExpenseDto
 {
-    [Required]
     public int Id { get; set; }
 
     [Required]
@@ -12,6 +11,4 @@ public class UpdateBudgetDto
 
     [Required, Range(1, Int32.MaxValue)]
     public int Amount { get; set; }
-
-    public List<CreateExpenseDto> Expenses { get; set; } = new List<CreateExpenseDto>();
 }
