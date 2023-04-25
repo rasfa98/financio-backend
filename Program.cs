@@ -15,7 +15,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: AllowedOrigins,
                       policy =>
                       {
-                          policy.WithOrigins(builder.Configuration.GetSection("AppSettings:Origins").Value) // TODO: Move to appsettings.json
+                          policy.WithOrigins(builder.Configuration.GetSection("AppSettings:Origins").Value)
                               .AllowAnyHeader()
                               .AllowAnyMethod();
                       });
