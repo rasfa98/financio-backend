@@ -26,6 +26,7 @@ builder.Services.AddSingleton<DapperContext>();
 builder.Services.AddScoped<IBudgetRepository, BudgetRepository>();
 builder.Services.AddScoped<IExpenseRepository, ExpenseRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddSwaggerGen(options =>
 {
