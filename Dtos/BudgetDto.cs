@@ -12,5 +12,6 @@ public class BudgetDto
     [Required, Range(1, Int32.MaxValue)]
     public int Amount { get; set; }
 
+    [Required]
     public List<ExpenseDto> Expenses { get; set; } = new List<ExpenseDto>();
 }
