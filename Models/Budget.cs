@@ -6,4 +6,5 @@ public class Budget
     public string Name { get; set; } = string.Empty;
     public int Amount { get; set; }
     public List<Expense> Expenses { get; set; } = new List<Expense>();
+    public int User_Id { get; set; }
 }

@@ -14,14 +14,15 @@ public class BudgetRepository : IBudgetRepository
         _context = context;
     }
 
-    public async Task<Budget> CreateBudget(BudgetDto budget)
+    public async Task<Budget> CreateBudget(BudgetDto budget, int userId)
     {
-        var query = "INSERT INTO budgets (name, amount) VALUES (@Name, @Amount); SELECT LAST_INSERT_ID()";
+        var query = "INSERT INTO budgets (name, amount, user_id) VALUES (@Name, @Amount, @UserId); SELECT LAST_INSERT_ID()";
 
         var parameters = new DynamicParameters();
 
         parameters.Add("Name", budget.Name, DbType.String);
         parameters.Add("Amount", budget.Amount, DbType.Int32);
+        parameters.Add("UserId", userId, DbType.Int32);
 
         using (var connection = _context.CreateConnection())
         {
@@ -107,6 +108,38 @@ public class BudgetRepository : IBudgetRepository
 
                 return currentBudget;
             });
+
+            return budgets.Distinct().ToList();
+        }
+    }
+
+    public async Task<IEnumerable<Budget>> GetUserBudgets(int userId)
+    {
+        var query = "SELECT * FROM budgets LEFT JOIN expenses ON budgets.id = expenses.budget_id WHERE budgets.user_id = @UserId";
+
+        var parameters = new DynamicParameters();
+
+        parameters.Add("UserId", userId, DbType.Int32);
+
+        using (var connection = _context.CreateConnection())
+        {
+            var budgetDictionary = new Dictionary<int, Budget>();
+
+            var budgets = await connection.QueryAsync<Budget, Expense, Budget>(query, (budget, expense) =>
+            {
+                if (!budgetDictionary.TryGetValue(budget.Id, out var currentBudget))
+                {
+                    currentBudget = budget;
+                    budgetDictionary.Add(currentBudget.Id, currentBudget);
+                }
+
+                if (expense != null)
+                {
+                    currentBudget.Expenses.Add(expense);
+                }
+
+                return currentBudget;
+            }, parameters);
 
             return budgets.Distinct().ToList();
         }
