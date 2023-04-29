@@ -141,7 +141,11 @@ public class BudgetRepository : IBudgetRepository
                 return currentBudget;
             }, parameters);
 
-            return budgets.Distinct().ToList();
+            return budgets.Distinct().ToList().Select(budget => {
+                budget.RemainingAmount = budget.Amount - budget.Expenses.Sum(expense => expense.Amount);
+
+                return budget;
+            });
         }
     }
 
