@@ -37,7 +37,7 @@ public class BudgetController : ControllerBase
         var userId = _userService.GetId();
         var budget = await _budgetRepository.GetBudget(id);
 
-        if (budget == null || budget.User_Id != userId)
+        if (budget == null || budget.UserId != userId)
         {
             return NotFound();
         }
@@ -68,7 +68,7 @@ public class BudgetController : ControllerBase
         var userId = _userService.GetId();
         var existingBudget = await _budgetRepository.GetBudget(id);
 
-        if (existingBudget == null || existingBudget.User_Id != userId)
+        if (existingBudget == null || existingBudget.UserId != userId)
         {
             return NotFound();
         }
@@ -104,7 +104,7 @@ public class BudgetController : ControllerBase
         var userId = _userService.GetId();
         var existingBudget = await _budgetRepository.GetBudget(id);
 
-        if (existingBudget == null || existingBudget.User_Id != userId)
+        if (existingBudget == null || existingBudget.UserId != userId)
         {
             return NotFound();
         }

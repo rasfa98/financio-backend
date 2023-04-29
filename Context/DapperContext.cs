@@ -10,6 +10,8 @@ public class DapperContext
 
     public DapperContext(IConfiguration configuration)
     {
+        Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+
         _configuration = configuration;
         _connectionString = configuration.GetConnectionString("DefaultConnection");
     }
