@@ -34,9 +34,10 @@ public class BudgetController : ControllerBase
     [HttpGet("{id}", Name = "GetBudget")]
     public async Task<IActionResult> GetBudget(int id)
     {
+        var userId = _userService.GetId();
         var budget = await _budgetRepository.GetBudget(id);
 
-        if (budget == null)
+        if (budget == null || budget.User_Id != userId)
         {
             return NotFound();
         }
