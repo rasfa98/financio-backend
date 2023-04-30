@@ -81,7 +81,7 @@ public class BudgetRepository : IBudgetRepository
                 return currentBudget;
             }, parameters);
 
-            return budgets.Distinct().First();
+            return budgets.Distinct().FirstOrDefault();
         }
     }
 

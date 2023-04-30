@@ -3,6 +3,7 @@ using FinancioBackend.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using FinancioBackend.Services;
+using FinancioBackend.AuthorizationRequirements;
 
 namespace FinancioBackend.Controllers;
 
@@ -14,12 +15,14 @@ public class BudgetController : ControllerBase
     private readonly IBudgetRepository _budgetRepository;
     private readonly IExpenseRepository _expenseRepository;
     private readonly IUserService _userService;
+    private readonly IAuthorizationService _authorizationService;
 
-    public BudgetController(IBudgetRepository budgetRepository, IExpenseRepository expenseRepository, IUserService userService)
+    public BudgetController(IBudgetRepository budgetRepository, IExpenseRepository expenseRepository, IUserService userService, IAuthorizationService authorizationService)
     {
         _budgetRepository = budgetRepository;
         _expenseRepository = expenseRepository;
         _userService = userService;
+        _authorizationService = authorizationService;
     }
 
     [HttpGet]
@@ -34,10 +37,15 @@ public class BudgetController : ControllerBase
     [HttpGet("{id}", Name = "GetBudget")]
     public async Task<IActionResult> GetBudget(int id)
     {
-        var userId = _userService.GetId();
         var budget = await _budgetRepository.GetBudget(id);
+        var authorizationResult = await _authorizationService.AuthorizeAsync(User, budget, BudgetRequirement.ReadRequirement);
 
-        if (budget == null || budget.UserId != userId)
+        if (!authorizationResult.Succeeded)
+        {
+            return Forbid();
+        }
+
+        if (budget == null)
         {
             return NotFound();
         }
@@ -65,10 +73,15 @@ public class BudgetController : ControllerBase
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateBudget(int id, BudgetDto budget)
     {
-        var userId = _userService.GetId();
         var existingBudget = await _budgetRepository.GetBudget(id);
+        var authorizationResult = await _authorizationService.AuthorizeAsync(User, existingBudget, BudgetRequirement.UpdateRequirement);
 
-        if (existingBudget == null || existingBudget.UserId != userId)
+        if (!authorizationResult.Succeeded)
+        {
+            return Forbid();
+        }
+
+        if (existingBudget == null)
         {
             return NotFound();
         }
@@ -101,10 +114,15 @@ public class BudgetController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteBudget(int id)
     {
-        var userId = _userService.GetId();
         var existingBudget = await _budgetRepository.GetBudget(id);
+        var authorizationResult = await _authorizationService.AuthorizeAsync(User, existingBudget, BudgetRequirement.DeleteRequirement);
 
-        if (existingBudget == null || existingBudget.UserId != userId)
+        if (!authorizationResult.Succeeded)
+        {
+            return Forbid();
+        }
+
+        if (existingBudget == null)
         {
             return NotFound();
         }

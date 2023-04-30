@@ -1,8 +1,10 @@
 using System.Text;
+using FinancioBackend.AuthorizationHandlers;
 using FinancioBackend.Context;
 using FinancioBackend.Repositories;
 using FinancioBackend.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
@@ -27,8 +29,9 @@ builder.Services.AddSingleton<DapperContext>();
 builder.Services.AddScoped<IBudgetRepository, BudgetRepository>();
 builder.Services.AddScoped<IExpenseRepository, ExpenseRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IUserService, UserService>(); 
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddTransient<IAuthorizationHandler, BudgetAuthorizationHandler>();
 
 builder.Services.AddSwaggerGen(options =>
 {
