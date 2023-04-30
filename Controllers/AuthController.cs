@@ -94,6 +94,6 @@ public class AuthController : ControllerBase
 
         string token = CreateJwtToken(existingUser);
 
-        return Ok(new { token });
+        return Ok(new { token, email = existingUser.Email });
     }
 }
