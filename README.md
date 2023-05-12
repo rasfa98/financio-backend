@@ -1,5 +1,5 @@
 # Financio Backend
-Web API for my web application Financio built with .NET 7.
+Web API for the web application Financio built with .NET 7.
 
 ## Technologies used
 
