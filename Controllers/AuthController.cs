@@ -39,7 +39,7 @@ public class AuthController : ControllerBase
                 new Claim(ClaimTypes.Email, user.Email),
             };
 
-        var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:Token").Value));
+        var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_configuration.GetSection("Token").Value));
 
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
 
