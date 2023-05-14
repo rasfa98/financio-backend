@@ -40,12 +40,7 @@ public class BudgetController : ControllerBase
         var budget = await _budgetRepository.GetBudget(id);
         var authorizationResult = await _authorizationService.AuthorizeAsync(User, budget, BudgetRequirement.ReadRequirement);
 
-        if (!authorizationResult.Succeeded)
-        {
-            return Forbid();
-        }
-
-        if (budget == null)
+        if (budget == null || !authorizationResult.Succeeded)
         {
             return NotFound();
         }
@@ -76,12 +71,7 @@ public class BudgetController : ControllerBase
         var existingBudget = await _budgetRepository.GetBudget(id);
         var authorizationResult = await _authorizationService.AuthorizeAsync(User, existingBudget, BudgetRequirement.UpdateRequirement);
 
-        if (!authorizationResult.Succeeded)
-        {
-            return Forbid();
-        }
-
-        if (existingBudget == null)
+        if (existingBudget == null || !authorizationResult.Succeeded)
         {
             return NotFound();
         }
@@ -117,12 +107,7 @@ public class BudgetController : ControllerBase
         var existingBudget = await _budgetRepository.GetBudget(id);
         var authorizationResult = await _authorizationService.AuthorizeAsync(User, existingBudget, BudgetRequirement.DeleteRequirement);
 
-        if (!authorizationResult.Succeeded)
-        {
-            return Forbid();
-        }
-
-        if (existingBudget == null)
+        if (existingBudget == null || !authorizationResult.Succeeded)
         {
             return NotFound();
         }
